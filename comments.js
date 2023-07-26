@@ -1,64 +1,33 @@
 // create web server
-// create a route for comments
-// create a route for comments/:id
-// create a route for comments/:id/:comment_id
-// create a route for comments/:id/:comment_id/edit
-// create a route for comments/:id/:comment_id/update
-// create a route for comments/:id/:comment_id/delete
+var express = require('express');
+var router = express.Router();
 
-// Path: comments.js
-// create web server
-// create a route for comments
-// create a route for comments/:id
-// create a route for comments/:id/:comment_id
-// create a route for comments/:id/:comment_id/edit
-// create a route for comments/:id/:comment_id/update
-// create a route for comments/:id/:comment_id/delete
+// import model
+var Comment = require('../models/comment.js');
 
-const express = require('express');
-const router = express.Router({mergeParams: true});
-const Campground = require('../models/campground');
-const Comment = require('../models/comment');
-const middleware = require('../middleware');
+// add comment
+router.post('/', function(req, res, next) {
+  // get comment data
+  var commentData = {
+    post: req.body.post,
+    name: req.body.name,
+    email: req.body.email,
+    body: req.body.body
+  };
 
-// NEW ROUTE
-router.get('/new', middleware.isLoggedIn, (req, res) => {
-  Campground.findById(req.params.id, (err, campground) => {
-    if (err) console.log(err);
-    else res.render('comments/new', {campground: campground});
-  });
-});
-
-// CREATE ROUTE
-router.post('/', middleware.isLoggedIn, (req, res) => {
-  Campground.findById(req.params.id, (err, campground) => {
-    if (err) console.log(err);
+  // create comment
+  Comment.create(commentData, function(error, comment) {
+    // if error
+    if (error) {
+      return next(error);
+    }
+    // if success
     else {
-      Comment.create(req.body.comment, (err, comment) => {
-        if (err) console.log(err);
-        else {
-          // add username and id to comment
-          comment.author.id = req.user._id;
-          comment.author.username = req.user.username;
-          // save comment
-          comment.save();
-          campground.comments.push(comment);
-          campground.save();
-          req.flash('success', 'Comment added');
-          res.redirect('/campgrounds/' + campground._id);
-        }
-      });
+      // redirect to post page
+      res.redirect('/posts/' + commentData.post);
     }
   });
 });
 
-// EDIT ROUTE
-router.get('/:comment_id/edit', middleware.checkCommentOwnership, (req, res) => {
-  Campground.findById(req.params.id, (err, campground) => {
-    if (err) {
-      req.flash('error', 'Campground not found');
-      res.redirect('back');
-    } else {
-      Comment.findById(req.params.comment_id, (err, comment) => {
-        if (err) {
-          req.flash('error', 'Comment not found');
+// export router
+module.exports = router;
