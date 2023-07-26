@@ -1,38 +1,22 @@
-// create web server using express
+// Create web server using Express.js
+// 1. Create a new Express web server
+// 2. Create a new route for GET requests to /comments
+// 3. Return all comments from the database as JSON
+// 4. Start the server on port 3001
+
 const express = require('express');
 const app = express();
-const path = require('path');
-// using the comments.js file
-const comments = require('./comments');
+const port = 3001;
 
-// using the public folder to serve static files
-app.use(express.static('public'));
+const comments = [
+    { username: 'tammy', comment: 'lololol' },
+    { username: 'james', comment: 'this is great!' },
+];
 
-// using the body parser
-const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// using the handlebars
-const exphbs = require('express-handlebars');
-app.engine('handlebars', exphbs());
-app.set('view engine', 'handlebars');
-
-// using the comments.js file
-app.get('/', (req, res) => {
-  res.render('index', { comments: comments.getAll() });
+app.get('/comments', (req, res) => {
+    res.json(comments);
 });
 
-// using the comments.js file
-app.post('/comments', (req, res) => {
-  comments.add(req.body.name, req.body.comment);
-  res.redirect('/');
-});
-
-// using the comments.js file
-app.get('/comments/:id', (req, res) => {
-  res.render('comments', { comment: comments.get(req.params.id) });
-});
-
-app.listen(3000, () => {
-  console.log('Listening on port 3000!');
+app.listen(port, () => {
+    console.log(`Server listening at http://localhost:${port}`);
 });
