@@ -34,5 +34,5 @@ http.createServer(function (request, response) {
    });   
 }).listen(8081);
 
-// Console will print the message
+// Console will print the message yup
 console.log('Server running at http://localhost:8081/comments.html');
